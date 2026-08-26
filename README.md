@@ -5,6 +5,11 @@ Plantilla base del curso de Minería de Datos
 **Pineda Lab**
 **ENES Morelia, UNAM**
 
+## Datos Académicos
+**Christian Iván Morales González**
+- chrisimg06@gmail.com
+
+
 ## Sobre el proyecto
 
 `mintic-base` es el repositorio plantilla sobre el que cada alumno construirá su propia librería de Minería de Datos. El objetivo es comprender el funcionamiento interno de los algoritmos, no únicamente usarlos.
