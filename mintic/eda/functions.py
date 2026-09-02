@@ -96,6 +96,8 @@ def detect_outliers(data, method='iqr', threshold=1.5):
 
     return resultado
 def handle_outliers(data, method='iqr', action='trim', threshold=1.5):
+    import numpy as np
+    
     df = data.copy()
 
     for col in df.columns:
