@@ -95,3 +95,53 @@ def detect_outliers(data, method='iqr', threshold=1.5):
         resultado[col] = es_outlier
 
     return resultado
+def handle_outliers(data, method='iqr', action='trim', threshold=1.5):
+    df = data.copy()
+
+    for col in df.columns:
+        # esta condición evita que se apliquen métodos de outliers a columnas no numéricas o booleanas usando la función proporcionada en clase
+        if pd.api.types.is_numeric_dtype(df[col]) == False or df[col].dtype == bool: 
+            continue
+
+        no_nan = df[col].dropna()
+
+        # Bloque de código recuperado de la función detect_outliers para calcular los límites de outliers
+        if method == 'iqr':
+            q1 = np.percentile(no_nan, 25)
+            q3 = np.percentile(no_nan, 75)
+            iqr = q3 - q1
+            limite_inferior = q1 - threshold * iqr
+            limite_superior = q3 + threshold * iqr
+
+        # Bloque de código recuperado de la función detect_outliers para calcular los límites de outliers
+        elif method == 'zscore':
+            suma = 0
+            for v in no_nan:
+                suma += v
+            media = suma / len(no_nan)
+
+            suma_cuadrados = 0
+            for v in no_nan:
+                suma_cuadrados += (v - media) ** 2
+            desviacion = (suma_cuadrados / len(no_nan)) ** 0.5
+
+            limite_inferior = media - threshold * desviacion
+            limite_superior = media + threshold * desviacion
+
+        else:
+            print("Método no válido:", method)
+            continue
+
+        if action == 'trim':
+            # se eliminan las filas donde el valor esté fuera de los límites
+            df = df[(df[col] >= limite_inferior) & (df[col] <= limite_superior) | df[col].isna()]
+
+        elif action == 'cap':
+            # recortamos los valores a los límites, sin eliminar filas
+            df.loc[df[col] < limite_inferior, col] = limite_inferior
+            df.loc[df[col] > limite_superior, col] = limite_superior
+
+        else:
+            print("Acción no válida:", action)
+
+    return df
