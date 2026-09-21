@@ -106,3 +106,49 @@ def build_random_forest(X, y, n_trees=10, random_state=42):
         lista_de_arboles.append(arbol)
 
     return lista_de_arboles
+
+def predict_ensemble(trees, X):
+    import numpy as np
+
+    def predecir_un_ejemplo(arbol, x):
+        if isinstance(arbol, dict) == False:
+            return arbol  # llegamos a una hoja, regresamos la clase
+
+        columna = list(arbol.keys())[0]
+        valor_del_ejemplo = x[columna]
+
+        if valor_del_ejemplo in arbol[columna]:
+            return predecir_un_ejemplo(arbol[columna][valor_del_ejemplo], x)
+        else:
+            return None  # valor no visto durante el entrenamiento
+
+    n_filas = X.shape[0]
+    predicciones_finales = []
+
+    for i in range(n_filas):
+        fila = X[i]
+        votos = []
+
+        for arbol in trees:
+            voto = predecir_un_ejemplo(arbol, fila)
+            if voto != None:
+                votos.append(voto)
+
+        if len(votos) == 0:
+            predicciones_finales.append(None)
+            continue
+
+        valores_unicos, conteos = np.unique(votos, return_counts=True)
+
+        max_conteo = np.max(conteos)
+        candidatos = []
+        for j in range(len(valores_unicos)):
+            if conteos[j] == max_conteo:
+                candidatos.append(valores_unicos[j])
+
+        candidatos_ordenados = sorted(candidatos)
+        clase_ganadora = candidatos_ordenados[0]
+
+        predicciones_finales.append(clase_ganadora)
+
+    return np.array(predicciones_finales)
