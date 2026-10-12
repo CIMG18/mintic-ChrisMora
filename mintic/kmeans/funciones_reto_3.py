@@ -96,3 +96,14 @@ def kmeans_fit(kmeans, verbose=True):
     kmeans['centroids'] = centroides
     kmeans['labels'] = asignar_clusters(datos, centroides)
     return kmeans
+# FUNCION 4:
+def inertia(kmeans):
+    if kmeans['labels'] is None:
+        raise ValueError("Primero hay que ejecutar kmeans_fit")
+
+    total = 0
+    for i in range(len(kmeans['data'])):
+        centroide = kmeans['centroids'][kmeans['labels'][i]]
+        d = euclidean_distance(kmeans['data'][i], centroide)
+        total = total + d ** 2
+    return total
