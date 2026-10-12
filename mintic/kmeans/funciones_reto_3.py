@@ -40,3 +40,59 @@ def create_kmeans(data, n_clusters=8, max_iter=1000, tol=0.0001, randomstate=Non
         'converged': False
     }
     return kmeans
+# FUNCION 3:
+def kmeans_fit(kmeans, verbose=True):
+
+    def asignar_clusters(datos, centroides):
+        etiquetas = []
+        for i in range(len(datos)):
+            mejor_cluster = 0
+            mejor_distancia = euclidean_distance(datos[i], centroides[0])
+            for c in range(1, len(centroides)):
+                d = euclidean_distance(datos[i], centroides[c])
+                if d < mejor_distancia:
+                    mejor_distancia = d
+                    mejor_cluster = c
+            etiquetas.append(mejor_cluster)
+        return np.array(etiquetas)
+
+    datos = kmeans['data']
+    centroides = kmeans['centroids']
+    k = kmeans['n_clusters']
+
+    for iteracion in range(1, kmeans['max_iter'] + 1):
+        etiquetas = asignar_clusters(datos, centroides)
+
+        nuevos_centroides = centroides.copy()
+        for c in range(k):
+            puntos_del_cluster = datos[etiquetas == c]
+            if len(puntos_del_cluster) > 0:
+                nuevos_centroides[c] = np.mean(puntos_del_cluster, axis=0)
+            # si el cluster quedó vacío, dejamos su centroide donde estaba
+
+        # qué tanto se movieron los centroides en esta iteración
+        cambio_maximo = 0
+        for c in range(k):
+            d = euclidean_distance(centroides[c], nuevos_centroides[c])
+            if d > cambio_maximo:
+                cambio_maximo = d
+
+        centroides = nuevos_centroides
+        kmeans['n_iter'] = iteracion
+
+        if verbose:
+            print("Iteración", iteracion, "- cambio máximo de centroides:", cambio_maximo)
+
+        if cambio_maximo <= kmeans['tol']:
+            kmeans['converged'] = True
+            break
+
+    if verbose:
+        if kmeans['converged']:
+            print("Convergió en", kmeans['n_iter'], "iteraciones")
+        else:
+            print("Se llegó al máximo de iteraciones sin converger")
+
+    kmeans['centroids'] = centroides
+    kmeans['labels'] = asignar_clusters(datos, centroides)
+    return kmeans
