@@ -107,3 +107,23 @@ def inertia(kmeans):
         d = euclidean_distance(kmeans['data'][i], centroide)
         total = total + d ** 2
     return total
+# FUNCION 5:
+def elbow(data, min=2, max=8, max_iter=1000, tol=0.001, randomstate=None):
+    valores_k = []
+    inercias = []
+
+    for k in range(min, max + 1):
+        modelo = create_kmeans(data, n_clusters=k, max_iter=max_iter, tol=tol, randomstate=randomstate)
+        modelo = kmeans_fit(modelo, verbose=False)
+        valores_k.append(k)
+        inercias.append(inertia(modelo))
+        print("k =", k, "- inercia:", inercias[-1])
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(valores_k, inercias, marker='o')
+    plt.xlabel("Número de clusters (k)")
+    plt.ylabel("Inercia")
+    plt.title("Método del codo")
+    plt.xticks(valores_k)
+    plt.grid(True)
+    plt.show()
