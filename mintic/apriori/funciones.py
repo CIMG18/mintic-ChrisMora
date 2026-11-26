@@ -114,3 +114,21 @@ def apriori(transactions, min_support=0.05, max_len=None, verbose=False):
     resultado = resultado.sort_values('support', ascending=False).reset_index(drop=True)
     return resultado
 
+def plot_itemsets(frequent_itemsets, top_n=10):
+    import matplotlib.pyplot as plt
+    
+    ordenados = frequent_itemsets.sort_values('support', ascending=False)
+    top = ordenados.head(top_n)
+
+    etiquetas = []
+    for itemset in top['itemsets']:
+        etiquetas.append(", ".join(sorted(itemset)))
+    valores = list(top['support'])
+
+    plt.figure(figsize=(9, 5))
+    plt.barh(etiquetas, valores)
+    plt.gca().invert_yaxis()  # el de mayor soporte arriba
+    plt.xlabel("Soporte")
+    plt.title("Itemsets frecuentes con mayor soporte")
+    plt.tight_layout()
+    plt.show()
