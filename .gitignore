@@ -10,3 +10,5 @@ venv/
 .DS_Store
 data/
 mintic/eda/data/
+*.ipynb
+*.json
